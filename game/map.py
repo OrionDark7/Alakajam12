@@ -1,9 +1,11 @@
 import pygame, pytmx
 
-tframecount = {"stone": 1, "rail": 1, "railh" : 1}
+tframecount = {"stone": 1, "rail": 1, "railh" : 1, "mine":1, "railx":1}
 tframes = {}
-cframecount = {"miner": 1}
+cframecount = {"miner": 2}
 cframes = {}
+
+hovers = ["miner", "mine"]
 
 for i in tframecount.keys():
     f = []
@@ -26,8 +28,10 @@ for i in cframecount.keys():
     cframes[str(i)] = f
 
 def loadmap(level):
+    global hovers
     tiles = pygame.sprite.Group()
     rails = pygame.sprite.Group()
+    hover = pygame.sprite.Group()
     mapdata = pytmx.TiledMap("./resources/map/" + str(level) + ".tmx")
     listmap = []
     for x in range(20):
@@ -35,15 +39,17 @@ def loadmap(level):
         for y in range(15):
             data = mapdata.get_tile_properties(x, y, 0)
             if not data == None:
-                print(x, y, data)
                 tile = Tile([x, y], data["type"])
                 tiles.add(tile)
                 if tile.type.startswith("rail"):
                     rails.add(tile)
                     listmap[x][y] = 1
+                if tile.type in hovers:
+                    hover.add(tile)
+                    listmap[x][y] = 2
     # for i in listmap:
     #    print(i)
-    return tiles, rails, listmap
+    return tiles, rails, hover, listmap
 
 
 class Tile(pygame.sprite.Sprite):
@@ -55,7 +61,7 @@ class Tile(pygame.sprite.Sprite):
         self.pos = list(gamepos)
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos[0] * 40, self.pos[1] * 40
-        self.data = {"storage": 0, "max": 10}
+        self.data = {"storage": 0, "max": 10, "carts":0}
         self.animated = bool(tframecount[str(self.type)] > 1)
         self.frame = 0
         if self.animated:
@@ -88,14 +94,12 @@ class Cart(pygame.sprite.Sprite):
         self.moving = False
         self.path = []
         self.target = self.rect.center
-        if self.animated:
-            self.frames = cframes[self.type]
-
+        self.frames = cframes[self.type]
     def pathfind(self, listmap, position):
         if not self.moving:
             queue = []
             visited = {}
-            if listmap[position[0]][position[1]] == 1:
+            if listmap[position[0]][position[1]] > 0:
                 queue.append([self.pos, None])
             i = None
             j = None
@@ -105,7 +109,7 @@ class Cart(pygame.sprite.Sprite):
                 i = queue[0][0]
                 j = queue[0][1]
                 queue.pop(0)
-                if listmap[i[0]][i[1]] == 1 and not str(i) in visited:
+                if bool(listmap[i[0]][i[1]] == 1 or [i[0], i[1]] == position) and not str(i) in visited:
                     visited[str(i)] = j
                     if i == position:
                         stop = True
@@ -128,31 +132,38 @@ class Cart(pygame.sprite.Sprite):
                     if i != None:
                         retraced.append(i)
                     i = visited[str(i)]
+                if listmap[position[0]][position[1]] == 2:
+                    retraced.pop(0)
                 retraced.reverse()
-                self.path = retraced
-                self.moving = True
-                self.target = (20 + self.path[0][0] * 40, 20 + self.path[0][1] * 40)
+                if len(retraced) > 0:
+                    self.path = retraced
+                    self.moving = True
+                    self.target = (20 + self.path[0][0] * 40, 20 + self.path[0][1] * 40)
 
     def update(self, action, mouse, listmap):
         if action == "update":
-            if self.animated:
-                if self.frame + 1 >= self.frames:
-                    self.frame = 0
-                else:
-                    self.frame += 1
-                oc = self.rect.center
-                self.image = self.frames[self.frame]
-                self.rect = self.image.get_rect()
-                self.rect.center = oc
+            oc = self.rect.center
             if self.moving:
                 if self.target[0] < self.rect.centerx:
-                    self.rect.centerx -= 1
+                    self.image = self.frames[1]
+                    self.rect = self.image.get_rect()
+                    self.rect.center = oc
+                    self.rect.centerx -= 4
                 elif self.target[0] > self.rect.centerx:
-                    self.rect.centerx += 1
+                    self.image = self.frames[1]
+                    self.rect = self.image.get_rect()
+                    self.rect.center = oc
+                    self.rect.centerx += 4
                 elif self.target[1] < self.rect.centery:
-                    self.rect.centery -= 1
+                    self.image = self.frames[0]
+                    self.rect = self.image.get_rect()
+                    self.rect.center = oc
+                    self.rect.centery -= 4
                 elif self.target[1] > self.rect.centery:
-                    self.rect.centery += 1
+                    self.image = self.frames[0]
+                    self.rect = self.image.get_rect()
+                    self.rect.center = oc
+                    self.rect.centery += 4
                 elif self.target == self.rect.center:
                     self.pos = self.path[0]
                     self.path.pop(0)
