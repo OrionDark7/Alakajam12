@@ -53,7 +53,7 @@ while running:
             m.pos(pygame.mouse.get_pos())
             if screen == "game":
                 if pygame.sprite.spritecollide(m, carts, False) and m.mode == "select":
-                    carts.update("select", m)
+                    carts.update("select", m, listmap)
                     if m.clickedcart != None:
                         m.mode = "action"
                 elif m.mode == "action" and m.clickedcart != None and pygame.sprite.spritecollide(m, rails, False):
@@ -67,9 +67,9 @@ while running:
             if event.key == pygame.K_SPACE:
                 carts.add(map.Cart(snaptogrid(m.tl), "miner"))
     if screen == "game":
-        window.fill([128, 128, 128])
+        window.fill([100, 100, 100])
         tiles.draw(window)
         carts.draw(window)
-        carts.update("update", m)
+        carts.update("update", m, listmap)
     pygame.display.flip()
 pygame.quit()

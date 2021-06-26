@@ -1,6 +1,6 @@
 import pygame, pytmx
 
-tframecount = {"stone": 1, "rail": 1}
+tframecount = {"stone": 1, "rail": 1, "railh" : 1}
 tframes = {}
 cframecount = {"miner": 1}
 cframes = {}
@@ -133,7 +133,7 @@ class Cart(pygame.sprite.Sprite):
                 self.moving = True
                 self.target = (20 + self.path[0][0] * 40, 20 + self.path[0][1] * 40)
 
-    def update(self, action, mouse):
+    def update(self, action, mouse, listmap):
         if action == "update":
             if self.animated:
                 if self.frame + 1 >= self.frames:
@@ -163,4 +163,3 @@ class Cart(pygame.sprite.Sprite):
         if action == "select":
             if self.rect.collidepoint(mouse.tl):
                 mouse.clickedcart = self
-                print("in")
