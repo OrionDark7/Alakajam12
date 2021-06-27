@@ -1,11 +1,11 @@
 import pygame, pytmx
 
-tframecount = {"stone": 1, "rail": 1, "railh" : 1, "mine":1, "railx":1}
+tframecount = {"stone": 1, "rail": 1, "railh" : 1, "mine":1, "railx":1, "coalcontainer":4, "ironcontainer":4, "coppercontainer":4}
 tframes = {}
 cframecount = {"miner": 2}
 cframes = {}
 
-hovers = ["miner", "mine"]
+hovers = ["miner", "mine", "coalcontainer", "ironcontainer", "coppercontainer"]
 
 for i in tframecount.keys():
     f = []
@@ -13,6 +13,7 @@ for i in tframecount.keys():
     f.append(img)
     if tframecount[str(i)] > 1:
         for j in range(tframecount[str(i)] - 1):
+            print("./resources/images/tiles/" + str(i) + str(j) + ".png")
             img = pygame.image.load("./resources/images/tiles/" + str(i) + str(j) + ".png")
             f.append(img)
     tframes[str(i)] = f
@@ -66,17 +67,19 @@ class Tile(pygame.sprite.Sprite):
         self.frame = 0
         if self.animated:
             self.frames = tframes[self.type]
-
     def update(self):
         if self.animated:
-            if self.frame + 1 >= self.frames:
-                self.frame = 0
+            if self.type.endswith("container"):
+                pass
             else:
-                self.frame += 1
-            oc = self.rect.center
-            self.image = self.frames[self.frame]
-            self.rect = self.image.get_rect()
-            self.rect.center = oc
+                if self.frame + 1 >= self.frames:
+                    self.frame = 0
+                else:
+                    self.frame += 1
+                oc = self.rect.center
+                self.image = self.frames[self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = oc
 
 
 class Cart(pygame.sprite.Sprite):
@@ -95,7 +98,7 @@ class Cart(pygame.sprite.Sprite):
         self.path = []
         self.target = self.rect.center
         self.frames = cframes[self.type]
-    def pathfind(self, listmap, position):
+    def pathfind(self, listmap, position, interactables, mouse):
         if not self.moving:
             queue = []
             visited = {}
@@ -139,6 +142,8 @@ class Cart(pygame.sprite.Sprite):
                     self.path = retraced
                     self.moving = True
                     self.target = (20 + self.path[0][0] * 40, 20 + self.path[0][1] * 40)
+                if pygame.sprite.spritecollide(mouse, interactables, False):
+                    type = pygame.sprite.spritecollide(mouse, interactables, False)[0]
 
     def update(self, action, mouse, listmap):
         if action == "update":

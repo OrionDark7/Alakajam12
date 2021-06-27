@@ -6,7 +6,7 @@ ui.window = window
 screen = "game"
 s = {"fullscreen": False}
 running = True
-gamedata = {"level": 0, "coal": 0, "iron": 1}
+gamedata = {"level": 0, "coal": 0, "iron": 1, "copper":0}
 tiles = pygame.sprite.Group()
 rails = pygame.sprite.Group()
 carts = pygame.sprite.Group()
@@ -16,6 +16,7 @@ clock = pygame.time.Clock()
 selected = pygame.image.load("./resources/images/selected.png")
 selected2 = pygame.image.load("./resources/images/selected2.png")
 box = pygame.image.load("./resources/images/box.png")
+uibox = pygame.image.load("./resources/images/ui box.png")
 
 class Mouse(pygame.sprite.Sprite):
     def __init__(self):
@@ -47,6 +48,7 @@ def loadlevel(number):
     gamedata["level"] = number
     gamedata["coal"] = 0
     gamedata["iron"] = 1
+    gamedata["copper"] = 0
 
 loadlevel(0)
 
@@ -87,7 +89,8 @@ while running:
             ui.Text(m.hoveritem.type.upper(), [m.rect.left+27, m.rect.top+25])
             if m.hoveritem.type.startswith("mine") and m.hoveritem not in carts:
                 ui.Resize(18)
-                ui.Text("Carts Inside: " + str(m.hoveritem.data["carts"]), [m.rect.left+27, m.rect.top+45])
+                ui.Text("Carts Inside: " + str(m.hoveritem.data["carts"]), [m.rect.left+27, m.rect.top+47])
+                ui.Text("Max Carts: " + str(m.hoveritem.data["max"]), [m.rect.left+27, m.rect.top+60])
         if not m.clickedcart == None:
             window.blit(selected2, [m.clickedcart.rect.left-2, m.clickedcart.rect.top-2])
             if m.mode == "action":
@@ -102,6 +105,7 @@ while running:
                     ui.Text("Click to move", [m.rect.left+27, m.rect.top+45])
                     ui.Text("Cart Here", [m.rect.left+27, m.rect.top+60])
         window.blit(selected, [snaptogrid(m.tl)[0]*40-2, snaptogrid(m.tl)[1]*40-2])
+        window.blit(uibox, [555, 475])
     pygame.display.flip()
     clock.tick(60)
     fps = clock.get_fps()

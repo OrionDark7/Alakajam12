@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.3.1" name="tiles" tilewidth="40" tileheight="40" tilecount="5" columns="0">
+<tileset version="1.2" tiledversion="1.3.1" name="tiles" tilewidth="40" tileheight="40" tilecount="8" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0" type="stone">
   <properties>
@@ -30,5 +30,17 @@
    <property name="type" value="railx"/>
   </properties>
   <image width="40" height="40" source="../images/tiles/railx.png"/>
+ </tile>
+ <tile id="5" type="coalcontainer">
+  <properties>
+   <property name="type" value="coalcontainer"/>
+  </properties>
+  <image width="40" height="40" source="../images/tiles/coalcontainer.png"/>
+ </tile>
+ <tile id="6" type="coppercontainer">
+  <image width="40" height="40" source="../images/tiles/coppercontainer.png"/>
+ </tile>
+ <tile id="7" type="ironcontainer">
+  <image width="40" height="40" source="../images/tiles/ironcontainer.png"/>
  </tile>
 </tileset>
